@@ -185,8 +185,8 @@ public class StockExchange implements Listener {
 				} else {
 					_stockExchangeStompClient.send("/topic/bDeals-"+buy.getBrokerName(),mes);
 					_stockExchangeStompClient.send("/topic/bDeals-"+sell.getBrokerName(),mes);
-					company._buyOrders.add(buy);
-					company._sellOrders.add(sell);
+//					company._buyOrders.add(buy);
+//					company._sellOrders.add(sell);
 				}
 			}
 		}
