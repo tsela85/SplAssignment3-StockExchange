@@ -3,8 +3,6 @@
  */
 package stockExchangePac;
 
-import brokerPac.StockOrder;
-
 /**
  * @author tom
  *

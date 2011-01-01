@@ -28,8 +28,6 @@ import javax.security.auth.login.LoginException;
 import javax.swing.text.html.MinimalHTMLWriter;
 import javax.swing.text.html.HTMLDocument.Iterator;
 
-import brokerPac.StockOrder;
-
 
 import Stomp.Client;
 import Stomp.Listener;
@@ -134,16 +132,18 @@ public class StockExchange implements Listener {
 
 	private void disconnectClient(String client) {
 		for(Company company : _companies.values()) { 
-			StockOrder order = company.getBuyOrders().get(client);
-			while (order != null) { //remove buy orders
-				company.getBuyOrders().remove(client);
-				order = company.getBuyOrders().get(client);
-			}
-			order = company.getSellOrders().get(client);
-			while (order != null) { //sell buy orders
-				company.getSellOrders().remove(client);
-				order = company.getSellOrders().get(client);
-			}
+			while (company.getBuyOrders().remove(client));
+			while (company.getSellOrders().remove(client));
+//			StockOrder order = company.getBuyOrders().remove(client);
+//			while (order != null) { //remove buy orders
+//				company.getBuyOrders().remove(client);
+//				order = company.getBuyOrders().get(client);
+//			}
+//			order = company.getSellOrders().get(client);
+//			while (order != null) { //sell buy orders
+//				company.getSellOrders().remove(client);
+//				order = company.getSellOrders().get(client);
+//			}
 		}
 		_numActiveClients--;
 		for (StockExchangeBroker broker : _brokers)
@@ -169,8 +169,8 @@ public class StockExchange implements Listener {
 	private void computeDeals() {
 		for(Company company : _companies.values()) {
 			while((company._buyOrders.size() > 0) && (company._sellOrders.size() > 0)) {	
-				StockOrder buy = company._buyOrders.get(company._buyOrders.firstKey());
-				StockOrder sell = company._sellOrders.get(company._sellOrders.firstKey());
+				StockOrder buy = company._buyOrders.pollFirst();
+				StockOrder sell = company._sellOrders.pollFirst();
 				if (sell.getPrice() > buy.getPrice()) break;
 				double price=Math.min(buy.getPrice(),sell.getPrice());
 				int amount=Math.min(buy.getAmount(), sell.getAmount());
@@ -185,8 +185,8 @@ public class StockExchange implements Listener {
 				} else {
 					_stockExchangeStompClient.send("/topic/bDeals-"+buy.getBrokerName(),mes);
 					_stockExchangeStompClient.send("/topic/bDeals-"+sell.getBrokerName(),mes);
-					company._buyOrders.remove(buy.getClientName());
-					company._sellOrders.remove(sell.getClientName());
+					company._buyOrders.add(buy);
+					company._sellOrders.add(sell);
 				}
 			}
 		}

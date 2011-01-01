@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import brokerPac.StockOrder;
 
 /**
  * @author tom
@@ -24,11 +23,6 @@ public class Company {
 	
 
 	public Company(String name,int stocks,double price) {
-		OrderComparator comp = new OrderComparator();
-		TreeSet<StockOrder> tmp = new TreeSet<StockOrder>(comp);
-		TreeSet<StockOrder> _brokers;
-		_brokers= new TreeSet<StockOrder>(new StockOrderCompare()); 
-		
 		_buyOrders = new TreeSet<StockOrder>(new StockOrderCompare());
 		_sellOrders = new TreeSet<StockOrder>(new StockOrderCompare());
 		_name=name;
