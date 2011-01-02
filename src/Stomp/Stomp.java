@@ -369,6 +369,11 @@ public abstract class Stomp {
    */
   public void send( String dest, String mesg ) {
     send( dest, mesg, null );
+    try {
+    	Thread.sleep(50);
+    } catch (InterruptedException e) {
+    	// TODO Auto-generated catch block
+    }
   }
 
 

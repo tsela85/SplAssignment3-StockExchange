@@ -106,4 +106,16 @@ public class Company {
 			_dailyDelta+=_floatingShares; //cancels the reduction done in the addSellOrder
 		}
 	}
+	
+	public void removeClientOrders(String client) {
+		for (StockOrder order :_sellOrders) {
+			if (order.getClientName() == client)
+				_sellOrders.remove(order);
+		}
+		for (StockOrder order :_buyOrders) {
+			if (order.getClientName() == client)
+				_buyOrders.remove(order);
+		}
+
+	}
 }

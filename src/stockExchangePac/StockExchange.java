@@ -132,8 +132,7 @@ public class StockExchange implements Listener {
 
 	private void disconnectClient(String client) {
 		for(Company company : _companies.values()) { 
-			while (company.getBuyOrders().remove(client));
-			while (company.getSellOrders().remove(client));
+			company.removeClientOrders(client);
 //			StockOrder order = company.getBuyOrders().remove(client);
 //			while (order != null) { //remove buy orders
 //				company.getBuyOrders().remove(client);
