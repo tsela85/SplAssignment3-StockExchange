@@ -131,25 +131,14 @@ public class StockExchange implements Listener {
 	}
 
 	private void disconnectClient(String client) {
-		for(Company company : _companies.values()) { 
+		for(Company company : _companies.values())
 			company.removeClientOrders(client);
-//			StockOrder order = company.getBuyOrders().remove(client);
-//			while (order != null) { //remove buy orders
-//				company.getBuyOrders().remove(client);
-//				order = company.getBuyOrders().get(client);
-//			}
-//			order = company.getSellOrders().get(client);
-//			while (order != null) { //sell buy orders
-//				company.getSellOrders().remove(client);
-//				order = company.getSellOrders().get(client);
-//			}
-		}
 		_numActiveClients--;
-		for (StockExchangeBroker broker : _brokers)
+		for (StockExchangeBroker broker : _brokers) {
 			broker.removeClient(client);
-//		//_brokers.get(_clients.get(client)).decClientNum(); TODO:
-//		_clients.remove(client);
-		_stockExchangeStompClient.unsubscribe("/topic/cDeals-"+client,this);
+			if (broker.getNumOfClients() == 0)
+				_numActiveCBrokers--;
+		}
 		_stockExchangeStompClient.send("/topic/cDisconnected","disconnected "+ client+"\n");
 	}
 
@@ -230,7 +219,7 @@ public class StockExchange implements Listener {
 					_numActiveCBrokers++;
 				broker.addClient(client);
 				_stockExchangeStompClient.send("/topic/cConnected","connected "+client+" "+broker.getName() +"\n");
-				_stockExchangeStompClient.subscribe("/topic/cDeals-"+client, this);
+			//	_stockExchangeStompClient.subscribe("/topic/cDeals-"+client, this);
 				_numActiveClients++;
 			}
 			_brokers.add(broker);
@@ -249,7 +238,7 @@ public class StockExchange implements Listener {
 		}
 		for(String broker : _newBrokers) {
 			_brokers. add(new StockExchangeBroker(broker));
-			_stockExchangeStompClient.send("/topic/bConnected", "connected "+broker+"\n");			
+			_stockExchangeStompClient.send("/topic/bConnected", "connected "+broker+"\n");
 		}
 		_newBrokers.clear();
 	}
