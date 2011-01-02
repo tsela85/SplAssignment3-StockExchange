@@ -22,7 +22,6 @@ public class StartStockExchange {
 	public static void main(String[] args) throws NumberFormatException, LoginException, IOException {
 		StockExchange stockExchange=new StockExchange(args[0],Integer.parseInt(args[1]));
 		stockExchange.startNewDay();
-
 	}
 
 }

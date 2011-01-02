@@ -523,6 +523,7 @@ public abstract class Stomp {
             Listener l = (Listener)i.next();
             try {
               l.message( h, b ,destination);
+              l.wakeMonitor();
             } catch (Exception e) {
               // Don't let listeners screw us over by throwing exceptions
             }

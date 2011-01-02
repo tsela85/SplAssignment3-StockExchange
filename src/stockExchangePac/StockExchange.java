@@ -37,7 +37,7 @@ import Stomp.Listener;
  *
  */
 public class StockExchange implements Listener {
-	static final int N=4; // max number of clients per broker
+	static final int N=2; // max number of clients per broker
 	Client _stockExchangeStompClient;
 	Map<String,Company> _companies;
 	TreeSet<StockExchangeBroker> _brokers;
@@ -47,8 +47,6 @@ public class StockExchange implements Listener {
 	Vector<String> _newClients;
 	int _day;
 	int _numActiveClients;
-	int _numActiveCBrokers;
-
 
 	public StockExchange(String server, int port, String login, String pass) throws FileNotFoundException, IOException, LoginException {
 		_stockExchangeStompClient = new Client(server,port,login,pass);
@@ -59,7 +57,6 @@ public class StockExchange implements Listener {
 		_numOfClosedBrockers=0;
 		_day=-1;
 		_numActiveClients=0;
-		_numActiveCBrokers=0;
 		_newBrokers= new Vector<String>();
 		_newClients= new Vector<String>();
 		//_clients= new HashMap<String,StockExchangeBroker>();
@@ -136,15 +133,13 @@ public class StockExchange implements Listener {
 		_numActiveClients--;
 		for (StockExchangeBroker broker : _brokers) {
 			broker.removeClient(client);
-			if (broker.getNumOfClients() == 0)
-				_numActiveCBrokers--;
 		}
 		_stockExchangeStompClient.send("/topic/cDisconnected","disconnected "+ client+"\n");
 	}
 
 	private void brokerClosedTheDay(String brokerName) {
 		_numOfClosedBrockers++;
-		if(_numOfClosedBrockers == _numActiveCBrokers)
+		if(_numOfClosedBrockers == _brokers.size())
 			endTheDay();
 	}
 
@@ -183,12 +178,20 @@ public class StockExchange implements Listener {
 	}
 
 	public void startNewDay() {
-		_numOfClosedBrockers=0;
-		_day++;
-		_stockExchangeStompClient.send("/topic/Calendar", "newDay "+_day+"\n");
-		connectNewBrokers();
-		connectNewClients();
-		publishPrices();
+		if (_day == -1) {
+			_day++;
+			_stockExchangeStompClient.send("/topic/Calendar", "newDay "+_day+"\n");
+			publishPrices();
+			connectNewBrokers();
+			connectNewClients();
+		} else {
+			_numOfClosedBrockers=0;
+			_day++;
+			connectNewBrokers();
+			connectNewClients();
+			_stockExchangeStompClient.send("/topic/Calendar", "newDay "+_day+"\n");
+			publishPrices();
+		}
 	}
 
 	private void publishPrices() {
@@ -198,28 +201,17 @@ public class StockExchange implements Listener {
 		_stockExchangeStompClient.send("/topic/Prices", mesg);
 	}
 
-	private  void connectNewClients() {
+	private void connectNewClients() {
 		while (_numActiveClients == 0 && _newClients.size() == 0) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			sleepMonitor();
 		}
 		for(String client : _newClients) {
-//			StockExchangeBroker keyB = _brokers.firstKey();
-//			StockExchangeBroker broker=_brokers.get(keyB);;
 			StockExchangeBroker broker=_brokers.pollFirst();;
 			if (broker.getNumOfClients() == N) {
 				_stockExchangeStompClient.send("/topic/Connected","connectFailed "+client+"\n");
-				_numActiveClients++;
 			} else {
-				if (broker.getNumOfClients() == 0)
-					_numActiveCBrokers++;
 				broker.addClient(client);
 				_stockExchangeStompClient.send("/topic/cConnected","connected "+client+" "+broker.getName() +"\n");
-			//	_stockExchangeStompClient.subscribe("/topic/cDeals-"+client, this);
 				_numActiveClients++;
 			}
 			_brokers.add(broker);
@@ -228,7 +220,7 @@ public class StockExchange implements Listener {
 	}
 
 	private  void connectNewBrokers() {
-		while (_numActiveCBrokers == 0 && _newBrokers.size() == 0) {
+		while (_brokers.size() == 0 && _newBrokers.size() == 0) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -258,5 +250,20 @@ public class StockExchange implements Listener {
 
 	private void connectBroker(String brokerName) {
 		_newBrokers.add(brokerName);
+	}
+
+	@Override
+	public void wakeMonitor() {
+		this.notifyAll();		
+	}
+
+	@Override
+	public synchronized void sleepMonitor() {
+		try {
+			this.wait(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

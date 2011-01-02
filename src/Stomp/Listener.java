@@ -7,4 +7,6 @@ import java.util.Map;
  */
 public interface Listener {
   public void message( Map headers, String body ,String origin);
+  public void wakeMonitor();
+  public void sleepMonitor();
 }
