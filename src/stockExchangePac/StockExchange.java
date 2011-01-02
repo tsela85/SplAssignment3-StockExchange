@@ -179,14 +179,9 @@ public class StockExchange implements Listener {
 				if (sell.getClientName().equals("StockExchange")) {
 					_cash+=price;
 					_stockExchangeStompClient.send("/topic/bDeals-"+buy.getBrokerName(),mes);
-					company._buyOrders.remove(buy.getClientName());
-					company._sellOrders.remove(sell.getClientName());
-					company.addDefaultOrder(); 
 				} else {
 					_stockExchangeStompClient.send("/topic/bDeals-"+buy.getBrokerName(),mes);
 					_stockExchangeStompClient.send("/topic/bDeals-"+sell.getBrokerName(),mes);
-//					company._buyOrders.add(buy);
-//					company._sellOrders.add(sell);
 				}
 			}
 		}

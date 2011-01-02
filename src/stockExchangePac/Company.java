@@ -20,6 +20,7 @@ public class Company {
 	public TreeSet<StockOrder> _buyOrders;
 	public TreeSet<StockOrder> _sellOrders;
 	private double _dailyDelta;
+	StockOrder _defualOrder;
 	
 
 	public Company(String name,int stocks,double price) {
@@ -90,6 +91,7 @@ public class Company {
 	
 	public void endDay() {
 		computeNewPrice();
+		addDefaultOrder();
 		_dailyDelta=0;
 //		_buyOrders.clear();
 //		_sellOrders.clear();
@@ -97,6 +99,8 @@ public class Company {
 	}
 
 	public void addDefaultOrder() {
+		_sellOrders.remove(_defualOrder);
+		_defualOrder=new StockOrder("sellOrder","StockExchange","StockExchange",_floatingShares,_name,_price);
 		if (_floatingShares > 0) {
 			addSellOrder("StockExchange","StockExchange",_floatingShares,_name,_price);
 			_dailyDelta+=_floatingShares; //cancels the reduction done in the addSellOrder
