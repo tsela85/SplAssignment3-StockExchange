@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="create_run_jar" name="SplAssignment3-StockExchange">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="SplAssignment3-StockExchange.classpath">
+        <pathelement location="bin"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+        <delete file="StockExchange.jar"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="SplAssignment3-StockExchange.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="New_configuration">
+        <java classname="stockExchangePac.StartStockExchange" failonerror="true" fork="yes">
+            <arg line="localhost 61613"/>
+            <classpath refid="SplAssignment3-StockExchange.classpath"/>
+        </java>
+    </target>
+    <target depends="build" name="create_run_jar">
+        <jar destfile="/tmp/SplAssignment3-StockExchange/StockExchange.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="stockExchangePac.StartStockExchange"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="/tmp/SplAssignment3-StockExchange/bin"/>
+        </jar>
+    </target>
+</project>
