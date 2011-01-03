@@ -43,12 +43,12 @@
         </java>
     </target>
     <target depends="build" name="create_run_jar">
-        <jar destfile="/tmp/SplAssignment3-StockExchange/StockExchange.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="./StockExchange.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="stockExchangePac.StartStockExchange"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="/tmp/SplAssignment3-StockExchange/bin"/>
+            <fileset dir="./bin"/>
         </jar>
     </target>
 </project>
