@@ -22,7 +22,7 @@ import Stomp.Listener;
  * 
  */
 public class StockExchange implements Listener {
-	static final int N=2; // max number of clients per broker
+	static final int N=4; // max number of clients per broker
 	Client _stockExchangeStompClient;
 	Map<String, Company> _companies;
 	TreeSet<StockExchangeBroker> _brokers;
